@@ -15,7 +15,12 @@
     }
 
     function formatCurrency(amount) {
-        return `PHP ${Number(amount || 0).toFixed(2)}`;
+        return new Intl.NumberFormat("en-PH", {
+            style: "currency",
+            currency: "PHP",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        }).format(Number(amount || 0));
     }
 
     function formatCompactCurrency(amount) {
@@ -78,6 +83,9 @@
         const now = parsedTransactions[0]?.__date || new Date();
         const filtered = parsedTransactions.filter((transaction) => {
             const date = transaction.__date;
+            if (filter === "__all__") {
+                return true;
+            }
             if (filter === "daily") {
                 return date.getFullYear() === now.getFullYear()
                     && date.getMonth() === now.getMonth()
@@ -164,6 +172,10 @@
             adminTotal: parsedTransactions.filter((item) => item.source === "Admin Control").reduce((sum, item) => sum + item.__amount, 0),
             topTransactions: parsedTransactions.slice().sort((a, b) => b.__amount - a.__amount).slice(0, 8),
         };
+    }
+
+    function collectPortfolioMetrics(transactions) {
+        return collectRevenueMetrics(transactions, "__all__");
     }
 
     function getPage() {
@@ -301,28 +313,20 @@
         }
     }
 
-    async function renderRevenuePage(activeFilter = null) {
+    async function renderRevenuePage() {
         const page = getPage();
         if (page !== "revenue") {
             return;
         }
 
-        const filter = activeFilter || window.__luxestayRevenueFilter || "monthly";
-        window.__luxestayRevenueFilter = filter;
-
         const state = await app.loadState();
-        const metrics = collectRevenueMetrics(state.transactions, filter);
+        const metrics = collectPortfolioMetrics(state.transactions);
         const dailyMetrics = collectRevenueMetrics(state.transactions, "daily");
         const monthlyMetrics = collectRevenueMetrics(state.transactions, "monthly");
         const quarterlyMetrics = collectRevenueMetrics(state.transactions, "quarterly");
         const yearlyMetrics = collectRevenueMetrics(state.transactions, "yearly");
-        const maxTrend = Math.max(...metrics.trend.map((item) => item.total), 1);
-
-        document.querySelectorAll(".revenue-filter-btn").forEach((button) => {
-            const isActive = button.getAttribute("data-revenue-filter") === filter;
-            button.classList.toggle("btn-gold", isActive);
-            button.classList.toggle("btn-secondary", !isActive);
-        });
+        const trendMetrics = monthlyMetrics;
+        const maxTrend = Math.max(...trendMetrics.trend.map((item) => item.total), 1);
 
         const selectedTotal = document.getElementById("revenue-selected-total");
         const selectedCopy = document.getElementById("revenue-selected-copy");
@@ -343,7 +347,7 @@
             selectedTotal.textContent = formatCurrency(metrics.total);
         }
         if (selectedCopy) {
-            selectedCopy.textContent = `${filter.charAt(0).toUpperCase() + filter.slice(1)} revenue snapshot from the latest operating window.`;
+            selectedCopy.textContent = "Portfolio-wide lifetime revenue snapshot across all recorded transactions.";
         }
         if (selectedBookings) {
             selectedBookings.textContent = String(metrics.count);
@@ -358,10 +362,10 @@
             bestDayCopy.textContent = metrics.bestDayValue ? `${formatCurrency(metrics.bestDayValue)} generated on the strongest day.` : "No transaction activity yet.";
         }
         if (trendTitle) {
-            trendTitle.textContent = `${filter.charAt(0).toUpperCase() + filter.slice(1)} revenue trend`;
+            trendTitle.textContent = "Monthly revenue trend";
         }
         if (trendCaption) {
-            trendCaption.textContent = `Reading the ${filter} revenue window`;
+            trendCaption.textContent = "Reading the latest monthly revenue rhythm";
         }
 
         renderMetricBlock(document, "revenue-daily-total", "revenue-daily-meta", dailyMetrics.total, dailyMetrics.count, "today");
@@ -388,7 +392,7 @@
         }
 
         if (trendBars) {
-            trendBars.innerHTML = metrics.trend.length ? metrics.trend.map((item) => `
+            trendBars.innerHTML = trendMetrics.trend.length ? trendMetrics.trend.map((item) => `
                 <div class="option-tile p-5">
                     <div class="flex items-center justify-between gap-4">
                         <div>
@@ -824,11 +828,6 @@
 
         if (page === "revenue") {
             renderRevenuePage();
-            document.querySelectorAll(".revenue-filter-btn").forEach((button) => {
-                button.addEventListener("click", () => {
-                    renderRevenuePage(button.getAttribute("data-revenue-filter") || "monthly");
-                });
-            });
         }
     });
 
