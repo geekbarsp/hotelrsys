@@ -8,9 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
-<body class="page-shell">
+<body class="page-shell" data-page="signup">
     <div class="app-layer auth-shell">
         <div class="section-shell auth-grid">
             <section class="auth-showcase p-8 sm:p-10 lg:p-12">
@@ -25,12 +25,10 @@
 
             <section class="auth-panel p-8 sm:p-10">
                 <div class="mx-auto flex h-full max-w-md flex-col justify-center">
-                    <a href="/" class="text-[0.7rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Back to Front Desk</a>
+                    <a href="index.html" class="text-[0.7rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Back to Front Desk</a>
                     <h2 class="mt-4 font-display text-5xl font-semibold text-[#171717]">Join the LuxeStay circle</h2>
-                    <?php if (!empty($error)): ?>
-                        <div class="mt-6 rounded-[22px] border border-[#b4534c]/20 bg-[#fff3f1] px-4 py-4 text-sm text-[#8d4038]"><?= h((string) $error) ?></div>
-                    <?php endif; ?>
-                    <form action="/signup" method="POST" class="mt-8 space-y-5">
+                    <div id="auth-error" class="mt-6"></div>
+                    <form id="signup-form" class="mt-8 space-y-5">
                         <div>
                             <label class="input-label" for="fullname">Full Name</label>
                             <input id="fullname" type="text" name="fullname" required class="luxury-input" placeholder="Your full name">
@@ -45,10 +43,13 @@
                         </div>
                         <button type="submit" class="btn-gold w-full">Request Membership</button>
                     </form>
-                    <p class="mt-8 text-sm text-gray-500">Already a member? <a href="/login" class="font-semibold text-[#171717] transition hover:text-[#aa771c]">Sign in here</a></p>
+                    <p class="mt-8 text-sm text-gray-500">Already a member? <a href="login.html" class="font-semibold text-[#171717] transition hover:text-[#aa771c]">Sign in here</a></p>
                 </div>
             </section>
         </div>
     </div>
+
+    <script src="static/github-runtime.js"></script>
+    <script src="static/github-pages.js"></script>
 </body>
 </html>

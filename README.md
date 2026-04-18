@@ -1,70 +1,61 @@
 # Hotelv2
 
-LuxeStay is a PHP hotel booking and admin portal with room browsing, reservations, loyalty rewards, employee management, and a small concierge chat experience.
+LuxeStay is now a GitHub-hostable static hotel booking app that preserves the original UI and core flows from the old localhost PHP version.
 
 ## Stack
 
-- PHP
-- MySQL / MariaDB via `mysqli`
+- HTML
+- CSS
+- Vanilla JavaScript
 - Tailwind via CDN
-- File-based runtime storage for sessions and uploaded discount proofs
+- Browser `localStorage` for session/data persistence
 
-## What is safe to commit
+## What Changed
 
-This repository is prepared so GitHub only receives source code and starter files.
+- Removed the PHP/MySQL/localhost dependency
+- Moved seeded app data into `data/seed-state.json`
+- Added a browser runtime in `static/github-runtime.js` that replaces the old backend APIs
+- Added page wiring in `static/github-pages.js` for login, rewards, my-unit, and protected routes
+- Kept the original LuxeStay interface in static `.html` pages
 
-Ignored local/runtime items:
+## Pages
 
-- `.env`
-- `cc.txt`
-- `storage/state.json`
-- `storage/php-server.pid`
-- `storage/sessions/*`
-- `storage/discount-proofs/*`
+- `index.html`
+- `login.html`
+- `signup.html`
+- `admin.html`
+- `employees.html`
+- `transactions.html`
+- `rewards.html`
+- `my-unit.html`
 
-## Local setup
-
-1. Copy `.env.example` to `.env`.
-2. Update the database values in `.env` if your MySQL credentials differ.
-3. Make sure PHP has the `mysqli` extension enabled.
-4. Start MySQL.
-5. Run the PHP server from the project root.
-
-Example with XAMPP on Windows:
-
-```powershell
-C:\xampp\php\php.exe -S localhost:8000
-```
-
-Then open `http://localhost:8000`.
-
-## Database behavior
-
-The app creates the configured database automatically if it does not exist and seeds starter data on first run.
-
-Default sample accounts:
+## Demo Accounts
 
 - Admin: `jayrpf` / `admin`
 - User: `guest` / `guest`
+- Superadmin code: `0000`
 
-Superadmin actions use the `SUPERADMIN_CODE` value from `.env`.
+## Local Preview
 
-## Folder notes
+Run any static file server from the project root.
 
-- `index.php` handles routing.
-- `php/bootstrap.php` contains bootstrapping, seeding, and persistence helpers.
-- `views/` contains page templates.
-- `static/` contains CSS and client-side JavaScript.
-- `storage/` is for runtime-only files and should stay mostly untracked.
+Example with Python:
 
-## Publishing to GitHub
+```powershell
+python -m http.server 8002
+```
 
-1. Initialize git if needed: `git init`
-2. Review ignored files with `git status`
-3. Add the project: `git add .`
-4. Commit: `git commit -m "Prepare Hotelv2 for GitHub"`
-5. Create a GitHub repo and push your branch
+Then open `http://127.0.0.1:8002/index.html`.
 
-## Deployment note
+## GitHub Pages
 
-For shared hosting or a VPS, point the web root at this project directory, provide the `.env` file on the server, and ensure PHP can write to `storage/sessions` and `storage/discount-proofs`.
+1. Push this repository to GitHub.
+2. In repository settings, enable GitHub Pages.
+3. Use the root of the default branch as the publish source.
+4. Open the published `index.html`.
+
+## Notes
+
+- App changes persist in the browser through `localStorage`.
+- The seeded data resets if you clear browser storage.
+- Discount proof uploads are simulated in browser storage instead of writing server files.

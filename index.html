@@ -1,22 +1,22 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuxeStay | PHP Edition</title>
+    <title>LuxeStay | GitHub Edition</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
-<body class="page-shell">
+<body class="page-shell" data-page="home">
     <div class="app-layer">
         <nav class="site-container relative z-[40] px-4 pt-5 sm:px-6 lg:px-8">
             <div class="section-shell relative overflow-visible flex flex-col gap-5 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                     <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.35em] text-gray-400">Luxury PMS</p>
-                    <a href="/" class="font-display text-3xl font-bold leading-none text-[#171717]">LUXESTAY <span class="gold-text">PHP</span></a>
+                    <a href="index.html" class="font-display text-3xl font-bold leading-none text-[#171717]">LUXESTAY <span class="gold-text">WEB</span></a>
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3 text-[0.72rem] font-extrabold uppercase tracking-[0.22em] text-gray-500">
@@ -24,46 +24,22 @@
                     <a href="#availability" class="transition hover:text-[#171717]">Calendar</a>
                     <a href="#customization" class="transition hover:text-[#171717]">Customization</a>
                     <a href="#concierge" class="transition hover:text-[#171717]">Concierge</a>
-                    <?php if (($sessionRole ?? '') === 'admin'): ?>
-                        <a href="/admin" class="transition hover:text-[#171717]">Executive Dashboard</a>
-                    <?php endif; ?>
+                    <a id="home-admin-link" href="admin.html" class="hidden transition hover:text-[#171717]">Executive Dashboard</a>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-3">
-                    <?php if (!empty($sessionUser)): ?>
-                        <div class="relative z-[70]">
-                            <button id="member-menu-toggle" type="button" class="rounded-full border border-black/5 bg-white/80 px-4 py-2 text-right">
-                                <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Member Active</p>
-                                <p class="text-sm font-semibold text-[#171717]">Welcome back, <span class="gold-text"><?= h(strtoupper((string) $sessionUser)) ?></span></p>
-                            </button>
-                            <div id="member-menu" class="absolute right-0 top-[calc(100%+0.65rem)] z-[60] hidden min-w-[220px] rounded-[24px] border border-[rgba(212,175,55,0.18)] bg-[#fcfbf8] p-3 shadow-2xl">
-                                <a href="/my-unit" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">My Unit</a>
-                                <a href="/rewards" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Reward Redemption</a>
-                                <a href="/login" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Switch Account</a>
-                                <a href="/logout" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Logout</a>
-                            </div>
-                        </div>
-                        <div class="rounded-full border border-[rgba(212,175,55,0.24)] bg-[#faf7ef] px-4 py-2 text-right">
-                            <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Loyalty Points</p>
-                            <p class="text-sm font-semibold text-[#171717]"><?= h((string) $currentPoints) ?> pts · <span class="gold-text"><?= h((string) $currentTier) ?></span></p>
-                        </div>
-                    <?php else: ?>
-                        <a href="/login" class="btn-secondary">Sign In</a>
-                        <a href="/signup" class="btn-gold">Join LuxeStay</a>
-                    <?php endif; ?>
-                </div>
+                <div id="home-session-controls" class="flex flex-wrap items-center gap-3"></div>
             </div>
         </nav>
 
         <main class="site-container flex flex-col gap-8 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
             <section class="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
                 <div class="section-shell px-6 py-8 sm:px-8 sm:py-10">
-                    <span class="eyebrow">PHP System</span>
-                    <h1 class="mt-4 font-display text-5xl font-semibold leading-[0.95] text-[#171717] sm:text-6xl">Premium stays with a <span class="gold-text">PHP-powered</span> booking flow.</h1>
-                    <p class="mt-5 max-w-3xl text-base leading-7 text-gray-600 sm:text-lg">The frontend now runs against PHP routes and APIs while keeping the same room browsing, booking, rewards, admin, and concierge experience.</p>
+                    <span class="eyebrow">GitHub Ready</span>
+                    <h1 class="mt-4 font-display text-5xl font-semibold leading-[0.95] text-[#171717] sm:text-6xl">Premium stays with a <span class="gold-text">GitHub-hosted</span> booking flow.</h1>
+                    <p class="mt-5 max-w-3xl text-base leading-7 text-gray-600 sm:text-lg">The same LuxeStay interface now runs as a browser-hosted website, keeping room browsing, booking, rewards, admin, and concierge tools without a localhost backend.</p>
                     <div class="summary-grid mt-8">
                         <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">Live Occupancy</p><p class="mt-3 text-3xl font-extrabold text-[#171717]">88%</p></div>
-                        <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">Loyalty Circle</p><p class="mt-3 text-3xl font-extrabold text-[#171717]"><?= h((string) $currentPoints) ?></p></div>
+                        <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">Loyalty Circle</p><p id="home-loyalty-stat" class="mt-3 text-3xl font-extrabold text-[#171717]">0</p></div>
                         <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">QR Check-in</p><p class="mt-3 text-3xl font-extrabold text-[#171717]">14</p></div>
                     </div>
                 </div>
@@ -225,7 +201,7 @@
                     </div>
                 </div>
                 <div id="chat-content" class="chat-body mt-4 space-y-3">
-                    <div class="chat-message bot">Welcome to LuxeStay. Ask about check-in, room policies, Wi-Fi, or say “agent” to connect with the executive desk.</div>
+                    <div class="chat-message bot">Welcome to LuxeStay. Ask about check-in, room policies, Wi-Fi, or say â€œagentâ€ to connect with the executive desk.</div>
                 </div>
                 <div class="mt-4 flex gap-2">
                     <input id="chat-input" type="text" placeholder="Type your question..." onkeypress="handleChat(event)" class="luxury-input">
@@ -264,6 +240,9 @@
         </div>
     </div>
 
-    <script src="/static/script.js"></script>
+    <script src="static/github-runtime.js"></script>
+    <script src="static/github-pages.js"></script>
+    <script src="static/script.js"></script>
 </body>
 </html>
+

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeStay | My Unit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body class="page-shell" data-page="my-unit">
+    <div class="app-layer">
+        <nav class="site-container px-4 pt-5 sm:px-6 lg:px-8">
+            <div class="section-shell flex flex-col gap-5 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.35em] text-gray-400">Guest Unit Portal</p>
+                    <a href="index.html" class="font-display text-3xl font-bold leading-none text-[#171717]">LUXESTAY <span class="gold-text">MY UNIT</span></a>
+                </div>
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                    <div class="rounded-full border border-[rgba(212,175,55,0.24)] bg-[#faf7ef] px-5 py-3 text-right">
+                        <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Member Active</p>
+                        <p id="my-unit-member-name" class="text-sm font-semibold text-[#171717]">GUEST</p>
+                    </div>
+                    <a href="index.html" class="btn-secondary min-w-[210px]">Back to Front Desk</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="site-container flex flex-col gap-8 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+            <div id="my-unit-flash"></div>
+            <div id="my-unit-content"></div>
+        </main>
+    </div>
+
+    <div id="frontdesk-chat-overlay" class="fixed inset-0 z-[120] hidden items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+        <div class="w-full max-w-2xl rounded-[32px] border border-[rgba(212,175,55,0.18)] bg-[#fcfbf8] p-6 shadow-2xl sm:p-8">
+            <div class="flex items-start justify-between gap-4 border-b border-black/5 pb-4">
+                <div>
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Frontdesk Live Chat</p>
+                    <h3 class="mt-2 font-display text-4xl font-semibold text-[#171717]">Frontdesk Staff Alya</h3>
+                </div>
+            </div>
+            <div id="frontdesk-chat-thread" class="mt-5 space-y-3 rounded-[24px] border border-black/5 bg-white/80 p-4">
+                <div class="chat-message bot">Hello, this is Frontdesk Staff Alya. If you need anything about the hotel or your room, just tell me here.</div>
+            </div>
+            <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+                <input id="frontdesk-chat-input" type="text" class="luxury-input flex-1" placeholder="Type your request for the front desk">
+                <button type="button" id="frontdesk-chat-send" class="btn-gold">Send</button>
+                <button type="button" id="frontdesk-chat-close" class="btn-secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="frontdesk-call-overlay" class="fixed inset-0 z-[121] hidden items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+        <div class="w-full max-w-md rounded-[32px] border border-[rgba(212,175,55,0.18)] bg-[#fcfbf8] p-6 text-center shadow-2xl sm:p-8">
+            <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Frontdesk Call</p>
+            <h3 class="mt-3 font-display text-4xl font-semibold text-[#171717]">Frontdesk Staff Marco</h3>
+            <div class="mx-auto mt-6 flex h-28 w-28 items-center justify-center rounded-full border border-[rgba(212,175,55,0.28)] bg-[#faf7ef] text-2xl font-extrabold text-[#171717]">Ringing...</div>
+            <button type="button" id="frontdesk-call-close" class="btn-gold mt-6 w-full">Hang Up</button>
+        </div>
+    </div>
+
+    <script src="static/github-runtime.js"></script>
+    <script src="static/github-pages.js"></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,9 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="static/style.css">
 </head>
-<body class="page-shell">
+<body class="page-shell" data-page="transactions">
     <div class="app-layer admin-shell">
         <div class="site-container flex flex-col gap-6">
             <header class="section-shell px-6 py-6 sm:px-8">
@@ -20,9 +20,9 @@
                         <h1 class="mt-3 font-display text-5xl font-semibold text-[#171717]">LuxeStay <span class="gold-text">Transactions</span></h1>
                     </div>
                     <div class="flex flex-wrap gap-3">
-                        <a href="/admin" class="btn-secondary">Back to Dashboard</a>
-                        <a href="/" class="btn-secondary">Exit to Front Desk</a>
-                        <a href="/logout" class="btn-gold">Sign Out</a>
+                        <a href="admin.html" class="btn-secondary">Back to Dashboard</a>
+                        <a href="index.html" class="btn-secondary">Exit to Front Desk</a>
+                        <a href="#" data-logout="true" class="btn-gold">Sign Out</a>
                     </div>
                 </div>
             </header>
@@ -126,6 +126,9 @@
             </div>
         </div>
     </div>
-    <script src="/static/script.js"></script>
+    <script src="static/github-runtime.js"></script>
+    <script src="static/github-pages.js"></script>
+    <script src="static/script.js"></script>
 </body>
 </html>
+

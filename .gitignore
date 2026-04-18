@@ -1,17 +1,8 @@
-.env
-.env.local
-.env.*.local
-
-# Local helper notes
-cc.txt
-
-# Runtime storage
-storage/state.json
-storage/php-server.pid
-storage/sessions/*
-!storage/sessions/.gitignore
-storage/discount-proofs/*
-!storage/discount-proofs/.gitignore
+# Local static preview helpers
+data/static-server.pid
+data/chrome-profile-*/
+data/*-probe.html
+data/chrome-*-dom.txt
 
 # OS / editor noise
 .DS_Store

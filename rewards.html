@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeStay | Reward Redemption</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body class="page-shell" data-page="rewards">
+    <div class="app-layer">
+        <nav class="site-container px-4 pt-5 sm:px-6 lg:px-8">
+            <div class="section-shell flex flex-col gap-5 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.35em] text-gray-400">Loyalty Circle</p>
+                    <a href="index.html" class="font-display text-3xl font-bold leading-none text-[#171717]">LUXESTAY <span class="gold-text">REWARDS</span></a>
+                </div>
+                <div class="flex flex-wrap items-center justify-end gap-3">
+                    <div class="rounded-full border border-[rgba(212,175,55,0.24)] bg-[#faf7ef] px-5 py-3 text-right">
+                        <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Current Points</p>
+                        <p id="rewards-points-pill" class="text-sm font-semibold text-[#171717]">0 pts · <span class="gold-text">Classic</span></p>
+                    </div>
+                    <a href="index.html" class="btn-secondary min-w-[210px]">Back to Front Desk</a>
+                </div>
+            </div>
+        </nav>
+
+        <main class="site-container flex flex-col gap-8 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+            <section class="section-shell px-6 py-8 sm:px-8 sm:py-10">
+                <span class="eyebrow">Reward Redemption</span>
+                <h1 class="mt-4 font-display text-5xl font-semibold leading-[0.95] text-[#171717] sm:text-6xl">Earn loyalty points from every stay and exchange them for <span class="gold-text">guest-first rewards</span>.</h1>
+                <div id="rewards-flash" class="mt-6"></div>
+            </section>
+
+            <section class="section-shell px-6 py-8 sm:px-8">
+                <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                        <span class="eyebrow">Redeem Items</span>
+                        <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Choose a redemption that fits your stay style.</h2>
+                    </div>
+                    <div class="rounded-[24px] border border-black/5 bg-white/80 px-5 py-4 text-right">
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Available Balance</p>
+                        <p id="rewards-balance" class="mt-2 text-3xl font-extrabold text-[#171717]">0 pts</p>
+                    </div>
+                </div>
+
+                <div id="rewards-grid" class="mt-8 grid gap-5 xl:grid-cols-3"></div>
+            </section>
+
+            <section class="grid gap-6 xl:grid-cols-2">
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <span class="eyebrow">Points History</span>
+                    <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Where your points came from.</h2>
+                    <div id="rewards-points-history" class="mt-6 space-y-4"></div>
+                </div>
+
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <span class="eyebrow">Reward History</span>
+                    <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Your redeemed LuxeStay privileges.</h2>
+                    <div id="rewards-redemption-history" class="mt-6 space-y-4"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="static/github-runtime.js"></script>
+    <script src="static/github-pages.js"></script>
+</body>
+</html>
