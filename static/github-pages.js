@@ -47,9 +47,17 @@
             const logoutLink = event.target.closest("[data-logout]");
             if (logoutLink) {
                 event.preventDefault();
-                app.logout("index.html");
+                logoutUser();
             }
-        });
+        }, true);
+    }
+
+    function logoutUser(event = null) {
+        if (event) {
+            event.preventDefault();
+        }
+        app.logout("index.html");
+        return false;
     }
 
     function guardProtectedPage() {
@@ -106,7 +114,7 @@
                         <a href="my-unit.html" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">My Unit</a>
                         <a href="rewards.html" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Reward Redemption</a>
                         <a href="login.html" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Switch Account</a>
-                        <a href="#" data-logout="true" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Logout</a>
+                        <a href="#" data-logout="true" onclick="return logoutUser(event)" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Logout</a>
                     </div>
                 </div>
                 <div class="rounded-full border border-[rgba(212,175,55,0.24)] bg-[#faf7ef] px-4 py-2 text-right">
@@ -480,4 +488,5 @@
     window.sendFrontdeskMessage = sendFrontdeskMessage;
     window.openFrontdeskCall = openFrontdeskCall;
     window.closeFrontdeskCall = closeFrontdeskCall;
+    window.logoutUser = logoutUser;
 })();
