@@ -202,16 +202,6 @@
         `;
     }
 
-    function attachGlobalActions() {
-        document.addEventListener("click", (event) => {
-            const logoutLink = event.target.closest("[data-logout]");
-            if (logoutLink) {
-                event.preventDefault();
-                logoutUser();
-            }
-        }, true);
-    }
-
     function logoutUser(event = null) {
         if (event) {
             event.preventDefault();
@@ -800,7 +790,6 @@
         }
     }
 
-    attachGlobalActions();
     guardProtectedPage();
     primePageShell();
 
