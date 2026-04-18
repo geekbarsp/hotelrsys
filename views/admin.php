@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeStay | Executive Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-shell">
+    <div class="app-layer admin-shell">
+        <div class="site-container flex flex-col gap-6">
+            <header class="section-shell px-6 py-6 sm:px-8">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                        <p class="text-[0.7rem] font-extrabold uppercase tracking-[0.32em] text-gray-400">Executive Control</p>
+                        <h1 class="mt-3 font-display text-5xl font-semibold text-[#171717]">LuxeStay <span class="gold-text">Dashboard</span></h1>
+                        <p class="mt-3 max-w-3xl text-base leading-7 text-gray-600">PHP admin workspace for rooms, watchlists, staffing, and transaction management.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <a href="/transactions" class="btn-secondary">Transactions</a>
+                        <a href="/employees" class="btn-secondary">Employees</a>
+                        <a href="/" class="btn-secondary">Exit to Front Desk</a>
+                        <a href="/logout" class="btn-gold">Sign Out</a>
+                    </div>
+                </div>
+            </header>
+
+            <section class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                <div class="luxury-card metric-card rounded-[28px] p-6">
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Live Revenue</p>
+                    <p class="mt-4 text-4xl font-extrabold text-[#171717]">PHP 42,917,428</p>
+                </div>
+                <div class="luxury-card metric-card rounded-[28px] p-6">
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Occupancy / Peak Level</p>
+                    <p class="mt-4 text-4xl font-extrabold text-[#171717]">88%</p>
+                </div>
+                <div class="luxury-card metric-card rounded-[28px] p-6">
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Pending QR Check-ins</p>
+                    <p id="pending-checkins-count" class="mt-4 text-4xl font-extrabold text-[#171717]">0</p>
+                    <p id="pending-checkins-copy" class="mt-3 text-sm text-gray-500">Total of booked and reserved guests.</p>
+                </div>
+                <a href="/employees" class="luxury-card metric-card rounded-[28px] p-6 transition hover:-translate-y-1">
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">OnDuty Staffs</p>
+                    <p id="onduty-staff-count" class="mt-4 text-4xl font-extrabold text-[#171717]">0</p>
+                    <p class="mt-3 text-sm text-gray-500">View the active employee roster and duty status.</p>
+                </a>
+            </section>
+
+            <section class="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                        <div>
+                            <span class="eyebrow">Operations</span>
+                            <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Room Monitoring and Status Control</h2>
+                        </div>
+                        <span class="status-pill available">Real-time room visibility</span>
+                    </div>
+                    <div class="mt-6 rounded-[24px] border border-dashed border-black/10 bg-[#faf7ef] p-5">
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Room Control Center</p>
+                        <div id="admin-status-feedback" class="mt-4 hidden rounded-[18px] border px-4 py-3 text-sm"></div>
+                    </div>
+                    <div class="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.8fr)_minmax(220px,0.65fr)]">
+                        <div>
+                            <label class="input-label" for="admin-room-search">Hotel or Unit Name</label>
+                            <input id="admin-room-search" type="text" class="luxury-input" placeholder="Search hotel or unit">
+                        </div>
+                        <div>
+                            <label class="input-label" for="admin-hotel-filter">Hotel</label>
+                            <select id="admin-hotel-filter" class="luxury-select"><option value="all">All Hotels</option></select>
+                        </div>
+                        <div>
+                            <label class="input-label" for="admin-status-filter">Status</label>
+                            <select id="admin-status-filter" class="luxury-select">
+                                <option value="all">All Statuses</option>
+                                <option value="Available">Available</option>
+                                <option value="Reserved">Reserved</option>
+                                <option value="Booked">Booked</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-shell mt-8">
+                        <table class="luxury-table">
+                            <thead>
+                                <tr>
+                                    <th>Room</th>
+                                    <th>Status</th>
+                                    <th>Tonight</th>
+                                    <th>Check-in</th>
+                                    <th>Price Signal</th>
+                                    <th>Update Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-room-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <span class="eyebrow">Service Channels</span>
+                    <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Reservation Watchlist</h2>
+                    <div class="mt-8 rounded-[24px] border border-dashed border-black/10 bg-[#faf7ef] p-5">
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Reservation Watchlist</p>
+                        <p class="mt-3 text-sm leading-6 text-gray-600">Booked and reserved rooms appear here automatically.</p>
+                    </div>
+                    <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="input-label" for="watchlist-search">Hotel or Unit Name</label>
+                            <input id="watchlist-search" type="text" class="luxury-input" placeholder="Search booked or reserved units">
+                        </div>
+                        <div>
+                            <label class="input-label" for="watchlist-status-filter">Watchlist Filter</label>
+                            <select id="watchlist-status-filter" class="luxury-select">
+                                <option value="all">Booked and Reserved</option>
+                                <option value="Booked">Booked Only</option>
+                                <option value="Reserved">Reserved Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="service-watchlist" class="mt-6 space-y-4">
+                        <div class="luxury-card rounded-[24px] p-5">
+                            <p class="text-sm text-gray-500">Loading reservation watchlist...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

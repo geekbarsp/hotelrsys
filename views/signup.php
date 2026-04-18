@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeStay | Join the Circle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-shell">
+    <div class="app-layer auth-shell">
+        <div class="section-shell auth-grid">
+            <section class="auth-showcase p-8 sm:p-10 lg:p-12">
+                <div class="relative z-10 flex h-full flex-col justify-between">
+                    <div>
+                        <p class="text-[0.7rem] font-extrabold uppercase tracking-[0.32em] text-white/70">Loyalty Circle</p>
+                        <h1 class="mt-4 font-display text-6xl font-semibold leading-[0.9] text-white">Create your <span class="gold-text">LuxeStay</span> profile.</h1>
+                        <p class="mt-5 max-w-xl text-base leading-7 text-white/78">Join the guest circle to unlock faster reservations, saved preferences, and rewards.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="auth-panel p-8 sm:p-10">
+                <div class="mx-auto flex h-full max-w-md flex-col justify-center">
+                    <a href="/" class="text-[0.7rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Back to Front Desk</a>
+                    <h2 class="mt-4 font-display text-5xl font-semibold text-[#171717]">Join the LuxeStay circle</h2>
+                    <?php if (!empty($error)): ?>
+                        <div class="mt-6 rounded-[22px] border border-[#b4534c]/20 bg-[#fff3f1] px-4 py-4 text-sm text-[#8d4038]"><?= h((string) $error) ?></div>
+                    <?php endif; ?>
+                    <form action="/signup" method="POST" class="mt-8 space-y-5">
+                        <div>
+                            <label class="input-label" for="fullname">Full Name</label>
+                            <input id="fullname" type="text" name="fullname" required class="luxury-input" placeholder="Your full name">
+                        </div>
+                        <div>
+                            <label class="input-label" for="username">Username</label>
+                            <input id="username" type="text" name="username" required class="luxury-input" placeholder="Choose a username">
+                        </div>
+                        <div>
+                            <label class="input-label" for="password">Password</label>
+                            <input id="password" type="password" name="password" required class="luxury-input" placeholder="Create a password">
+                        </div>
+                        <button type="submit" class="btn-gold w-full">Request Membership</button>
+                    </form>
+                    <p class="mt-8 text-sm text-gray-500">Already a member? <a href="/login" class="font-semibold text-[#171717] transition hover:text-[#aa771c]">Sign in here</a></p>
+                </div>
+            </section>
+        </div>
+    </div>
+</body>
+</html>

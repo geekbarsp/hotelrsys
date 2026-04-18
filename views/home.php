@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuxeStay | PHP Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="page-shell">
+    <div class="app-layer">
+        <nav class="site-container relative z-[40] px-4 pt-5 sm:px-6 lg:px-8">
+            <div class="section-shell relative overflow-visible flex flex-col gap-5 px-5 py-4 sm:px-6 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.35em] text-gray-400">Luxury PMS</p>
+                    <a href="/" class="font-display text-3xl font-bold leading-none text-[#171717]">LUXESTAY <span class="gold-text">PHP</span></a>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 text-[0.72rem] font-extrabold uppercase tracking-[0.22em] text-gray-500">
+                    <a href="#suites" class="transition hover:text-[#171717]">Suites</a>
+                    <a href="#availability" class="transition hover:text-[#171717]">Calendar</a>
+                    <a href="#customization" class="transition hover:text-[#171717]">Customization</a>
+                    <a href="#concierge" class="transition hover:text-[#171717]">Concierge</a>
+                    <?php if (($sessionRole ?? '') === 'admin'): ?>
+                        <a href="/admin" class="transition hover:text-[#171717]">Executive Dashboard</a>
+                    <?php endif; ?>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <?php if (!empty($sessionUser)): ?>
+                        <div class="relative z-[70]">
+                            <button id="member-menu-toggle" type="button" class="rounded-full border border-black/5 bg-white/80 px-4 py-2 text-right">
+                                <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Member Active</p>
+                                <p class="text-sm font-semibold text-[#171717]">Welcome back, <span class="gold-text"><?= h(strtoupper((string) $sessionUser)) ?></span></p>
+                            </button>
+                            <div id="member-menu" class="absolute right-0 top-[calc(100%+0.65rem)] z-[60] hidden min-w-[220px] rounded-[24px] border border-[rgba(212,175,55,0.18)] bg-[#fcfbf8] p-3 shadow-2xl">
+                                <a href="/my-unit" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">My Unit</a>
+                                <a href="/rewards" class="block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Reward Redemption</a>
+                                <a href="/login" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Switch Account</a>
+                                <a href="/logout" class="mt-1 block rounded-[18px] px-4 py-3 text-[0.72rem] font-extrabold uppercase tracking-[0.18em] text-gray-500 transition hover:bg-[#faf7ef] hover:text-[#171717]">Logout</a>
+                            </div>
+                        </div>
+                        <div class="rounded-full border border-[rgba(212,175,55,0.24)] bg-[#faf7ef] px-4 py-2 text-right">
+                            <p class="text-[0.62rem] font-extrabold uppercase tracking-[0.28em] text-gray-400">Loyalty Points</p>
+                            <p class="text-sm font-semibold text-[#171717]"><?= h((string) $currentPoints) ?> pts · <span class="gold-text"><?= h((string) $currentTier) ?></span></p>
+                        </div>
+                    <?php else: ?>
+                        <a href="/login" class="btn-secondary">Sign In</a>
+                        <a href="/signup" class="btn-gold">Join LuxeStay</a>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </nav>
+
+        <main class="site-container flex flex-col gap-8 px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+            <section class="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
+                <div class="section-shell px-6 py-8 sm:px-8 sm:py-10">
+                    <span class="eyebrow">PHP System</span>
+                    <h1 class="mt-4 font-display text-5xl font-semibold leading-[0.95] text-[#171717] sm:text-6xl">Premium stays with a <span class="gold-text">PHP-powered</span> booking flow.</h1>
+                    <p class="mt-5 max-w-3xl text-base leading-7 text-gray-600 sm:text-lg">The frontend now runs against PHP routes and APIs while keeping the same room browsing, booking, rewards, admin, and concierge experience.</p>
+                    <div class="summary-grid mt-8">
+                        <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">Live Occupancy</p><p class="mt-3 text-3xl font-extrabold text-[#171717]">88%</p></div>
+                        <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">Loyalty Circle</p><p class="mt-3 text-3xl font-extrabold text-[#171717]"><?= h((string) $currentPoints) ?></p></div>
+                        <div class="hero-stat"><p class="text-[0.65rem] font-extrabold uppercase tracking-[0.24em] text-gray-400">QR Check-in</p><p class="mt-3 text-3xl font-extrabold text-[#171717]">14</p></div>
+                    </div>
+                </div>
+
+                <div class="media-stage mood-neutral" id="preview-container" style="background-image: url('https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1400&q=80');">
+                    <div class="media-stage-panel">
+                        <div class="mb-4 flex flex-wrap gap-2">
+                            <span class="tag-chip">Room Preview</span>
+                            <span class="tag-chip">Dynamic Pricing</span>
+                            <span class="tag-chip">Reservation Flow</span>
+                        </div>
+                        <h2 class="font-display text-4xl font-semibold">Ocean Whisper Suite</h2>
+                        <p class="mt-2 max-w-xl text-sm leading-6 text-white/80">Explore the inventory, confirm payment, and continue into arrival support from the same website.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="suites" class="section-shell px-6 py-8 sm:px-8">
+                <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+                    <div class="max-w-3xl">
+                        <span class="eyebrow">Signature Inventory</span>
+                        <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Browse hotels and rooms.</h2>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(220px,0.7fr)]">
+                    <div>
+                        <label class="input-label" for="suite-search">Hotel or Unit Name</label>
+                        <input id="suite-search" type="text" class="luxury-input" placeholder="Search hotel or unit name">
+                    </div>
+                    <div>
+                        <label class="input-label" for="suite-hotel-filter">Hotel</label>
+                        <select id="suite-hotel-filter" class="luxury-select"><option value="all">All Hotels</option></select>
+                    </div>
+                    <div>
+                        <label class="input-label" for="suite-status-filter">Availability</label>
+                        <select id="suite-status-filter" class="luxury-select">
+                            <option value="all">Available, Booked, Reserved</option>
+                            <option value="Available">Available</option>
+                            <option value="Booked">Booked</option>
+                            <option value="Reserved">Reserved</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="room-grid" class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-3"></div>
+            </section>
+
+            <section id="availability" class="split-panel">
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <span class="eyebrow">Availability Intelligence</span>
+                    <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Real Time Calendar View</h2>
+                    <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                        <div class="luxury-card rounded-[28px] p-5">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="input-label" for="calendar-room-filter">Preferred Suite</label>
+                                    <select id="calendar-room-filter" class="luxury-select"><option value="all">All Suites</option></select>
+                                </div>
+                                <div>
+                                    <label class="input-label" for="arrival-date">Arrival Date</label>
+                                    <input id="arrival-date" type="date" class="luxury-input">
+                                </div>
+                                <div>
+                                    <label class="input-label" for="departure-date">Departure Date</label>
+                                    <input id="departure-date" type="date" class="luxury-input">
+                                </div>
+                            </div>
+                            <div class="mt-6 rounded-[22px] border border-dashed border-black/10 bg-[#faf7ef] p-4">
+                                <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Smart Suggestions</p>
+                                <div id="suggestion-box" class="mt-3 text-sm leading-6 text-gray-600">Select a suite to see similar available alternatives when dates are blocked.</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="mb-4 flex flex-wrap items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-gray-500">
+                                <span class="status-pill booked">Booked</span>
+                                <span class="status-pill peak">Peak Demand</span>
+                                <span class="status-pill available">Low Demand</span>
+                            </div>
+                            <div id="calendar-grid" class="calendar-grid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-shell px-6 py-8 sm:px-8">
+                    <span class="eyebrow">Payment Journey</span>
+                    <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Booking, receipt, and trip tracking</h2>
+                    <div class="receipt-box mt-8 p-5">
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Sample Receipt Preview</p>
+                        <div class="mt-4 grid gap-3 text-sm text-gray-600">
+                            <div class="flex items-center justify-between"><span>Room + Stay Hold</span><span class="font-semibold text-[#171717]">PHP 6500.00</span></div>
+                            <div class="flex items-center justify-between"><span>Payment Method</span><span class="font-semibold text-[#171717]">GCash, Card, QRPH, Banking</span></div>
+                            <div class="flex items-center justify-between"><span>Refund Window</span><span class="font-semibold text-[#171717]">48 hours prior</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="customization" class="section-shell px-6 py-8 sm:px-8">
+                <span class="eyebrow">Room Customization System</span>
+                <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Shape ambience and stay preferences.</h2>
+                <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
+                    <div class="media-stage mood-neutral" id="customization-stage" style="background-image: url('https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1400&q=80');">
+                        <div class="media-stage-panel">
+                            <span class="tag-chip">Interactive Ambience Preview</span>
+                        </div>
+                    </div>
+                    <div class="luxury-card rounded-[30px] p-5">
+                        <div class="space-y-5">
+                            <div>
+                                <label class="input-label" for="mood-select">Lighting Mood</label>
+                                <select id="mood-select" onchange="applyMood(this.value)" class="luxury-select">
+                                    <option value="neutral">Neutral Daylight</option>
+                                    <option value="warm">Romantic / Golden Hour</option>
+                                    <option value="cool">Productivity / Cool</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="input-label" for="layout-select">Room Layout</label>
+                                <select id="layout-select" class="luxury-select">
+                                    <option>Relaxation Retreat</option>
+                                    <option>Executive Workspace Setup</option>
+                                    <option>Anniversary Decoration</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="input-label" for="pillow-select">Pillow Preference</label>
+                                <select id="pillow-select" class="luxury-select">
+                                    <option>Soft Feather Pillow</option>
+                                    <option>Firm Support Pillow</option>
+                                    <option>Hypoallergenic Silk Pillow</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="concierge" class="section-shell px-6 py-8 sm:px-8">
+                <span class="eyebrow">Live Support</span>
+                <h2 class="mt-4 font-display text-4xl font-semibold text-[#171717]">Chatbot first, human fallback ready.</h2>
+            </section>
+        </main>
+
+        <div id="floating-chat" class="floating-chat is-minimized">
+            <button id="chat-toggle" type="button" onclick="toggleChatWidget()" class="chat-toggle">
+                <span class="inline-flex h-2.5 w-2.5 rounded-full bg-green-500 pulse-soft"></span>
+                <span>ASK HOTEL</span>
+            </button>
+            <div class="chat-shell p-4">
+                <div class="flex items-center justify-between gap-4 border-b border-black/5 pb-3">
+                    <div>
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Hotel Concierge</p>
+                        <p class="mt-1 flex items-center gap-2 text-sm font-semibold text-[#171717]"><span class="inline-flex h-2.5 w-2.5 rounded-full bg-green-500 pulse-soft"></span>Live now</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="status-pill available">Human fallback ready</span>
+                        <button type="button" onclick="toggleChatWidget(false)" class="chat-collapse" aria-label="Minimize chat">-</button>
+                    </div>
+                </div>
+                <div id="chat-content" class="chat-body mt-4 space-y-3">
+                    <div class="chat-message bot">Welcome to LuxeStay. Ask about check-in, room policies, Wi-Fi, or say “agent” to connect with the executive desk.</div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <input id="chat-input" type="text" placeholder="Type your question..." onkeypress="handleChat(event)" class="luxury-input">
+                    <button type="button" onclick="sendChatMessage()" class="btn-gold !min-h-[3.25rem] !px-5">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="checkout-modal" class="fixed inset-0 z-[100] hidden items-start justify-center overflow-y-auto bg-black/65 px-4 py-8 backdrop-blur-sm">
+            <div class="modal-panel w-full max-w-[1320px] rounded-[34px] bg-[#fcfbf8] p-6 shadow-2xl sm:p-8">
+                <div class="flex flex-col gap-4 border-b border-black/5 pb-5 sm:flex-row sm:items-start sm:justify-between">
+                    <div>
+                        <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">Reservation Flow</p>
+                        <h2 class="mt-2 font-display text-4xl font-semibold text-[#171717]">Complete your LuxeStay reservation</h2>
+                    </div>
+                    <button type="button" onclick="closeModal()" class="btn-secondary">Close</button>
+                </div>
+                <div id="modal-content" class="mt-6"></div>
+            </div>
+        </div>
+
+        <div id="guest-overlay" class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/60 px-4 py-8 backdrop-blur-sm">
+            <div id="guest-overlay-panel" class="w-full max-w-xl rounded-[32px] border border-[rgba(212,175,55,0.18)] bg-[#fcfbf8] p-6 shadow-2xl sm:p-8">
+                <div class="border-b border-black/5 pb-4">
+                    <p class="text-[0.68rem] font-extrabold uppercase tracking-[0.22em] text-gray-400">LuxeStay Booking</p>
+                    <h3 id="guest-overlay-title" class="mt-2 font-display text-4xl font-semibold text-[#171717]">Notice</h3>
+                </div>
+                <div class="mt-5 space-y-4">
+                    <div id="guest-overlay-message" class="text-sm leading-7 text-gray-600"></div>
+                </div>
+                <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    <button id="guest-overlay-cancel" type="button" onclick="closeGuestOverlay(false)" class="btn-secondary">Cancel</button>
+                    <button id="guest-overlay-confirm" type="button" onclick="closeGuestOverlay(true)" class="btn-gold">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
