@@ -539,9 +539,6 @@ if ($path === '/api/checkout' && $method === 'POST') {
     $finalAmount = (float) ($data['final_amount'] ?? 0);
     $discountRequiresProof = in_array($discountLabel, ['PWD Discount', 'Senior Citizen Discount'], true) && $discountAmount > 0;
 
-    if ($roomId <= 0) {
-        json_response(['error' => 'Room selection is required.'], 400);
-    }
     if ($guestName === '') {
         json_response(['error' => 'Guest name is required.'], 400);
     }
@@ -581,75 +578,82 @@ if ($path === '/api/checkout' && $method === 'POST') {
     $processedRoom = $roomId ? get_processed_room_by_id($state, $roomId) : null;
     $roomIndex = $roomId ? find_item_index($state['rooms'], static fn(array $item): bool => (int) $item['id'] === $roomId) : null;
 
-    if ($roomIndex === null || $processedRoom === null) {
-        json_response(['error' => 'Selected room was not found.'], 404);
-    }
+    if ($roomIndex !== null && $processedRoom !== null) {
+        $state['rooms'][$roomIndex]['status'] = $reservationMode ? 'Reserved' : 'Booked';
+        $bookingNotes = sprintf('Created from booking checkout flow. Subtotal: %.2f. Discount: %s (%.2f).', $subtotalAmount, $discountLabel ?: 'None', $discountAmount);
+        if ($discountProof !== null) {
+            $bookingNotes .= ' Discount ID submitted: ' . $discountProof['original_name'] . '.';
+        }
+        add_transaction(
+            $state,
+            $processedRoom,
+            $state['rooms'][$roomIndex]['status'],
+            'Guest Booking',
+            $paymentLabel,
+            $receiptId,
+            $bookingNotes,
+            $guestName,
+            $contactNumber,
+            $finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0),
+            (string) (current_user_name() ?? ''),
+            $checkinDate,
+            $checkoutDate,
+            false,
+            '',
+            [
+                'discount_label' => $discountLabel,
+                'discount_amount' => $discountAmount,
+                'discount_proof_name' => $discountProof['original_name'] ?? '',
+                'discount_proof_path' => $discountProof['path'] ?? '',
+                'discount_proof_type' => $discountProof['mime_type'] ?? '',
+                'discount_verified' => $discountProof !== null,
+            ]
+        );
 
-    if (($processedRoom['status'] ?? '') !== 'Available') {
-        json_response(['error' => 'Selected room is no longer available.'], 409);
-    }
+        $username = current_user_name();
+        if ($username) {
+            $earnedPoints = (int) floor(($finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0)) / 10);
+            record_points_transaction(
+                $state,
+                $username,
+                $earnedPoints,
+                'Stay Earned Points',
+                'Earned from booking ' . $processedRoom['name'] . ' at ' . $processedRoom['hotel_name'],
+                $receiptId
+            );
+            $message .= ' ' . $earnedPoints . ' loyalty points added to your account.';
+        }
 
-    $state['rooms'][$roomIndex]['status'] = $reservationMode ? 'Reserved' : 'Booked';
-    $bookingNotes = sprintf('Created from booking checkout flow. Subtotal: %.2f. Discount: %s (%.2f).', $subtotalAmount, $discountLabel ?: 'None', $discountAmount);
-    if ($discountProof !== null) {
-        $bookingNotes .= ' Discount ID submitted: ' . $discountProof['original_name'] . '.';
-    }
-    add_transaction(
-        $state,
-        $processedRoom,
-        $state['rooms'][$roomIndex]['status'],
-        'Guest Booking',
-        $paymentLabel,
-        $receiptId,
-        $bookingNotes,
-        $guestName,
-        $contactNumber,
-        $finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0),
-        (string) (current_user_name() ?? ''),
-        $checkinDate,
-        $checkoutDate,
-        false,
-        '',
-        [
+        $state['rooms'][$roomIndex]['updated_at'] = date(DATE_ATOM);
+        save_state($state);
+
+        json_response([
+            'status' => 'success',
+            'message' => $message,
+            'receipt' => $receiptId,
+            'qr_code' => 'ACTIVE_RESERVATION_TOKEN_XYZ',
+            'room_status' => $state['rooms'][$roomIndex]['status'],
+            'payment_type' => $paymentLabel,
+            'subtotal_amount' => $subtotalAmount,
             'discount_label' => $discountLabel,
             'discount_amount' => $discountAmount,
+            'final_amount' => $finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0),
             'discount_proof_name' => $discountProof['original_name'] ?? '',
-            'discount_proof_path' => $discountProof['path'] ?? '',
-            'discount_proof_type' => $discountProof['mime_type'] ?? '',
-            'discount_verified' => $discountProof !== null,
-        ]
-    );
-
-    $username = current_user_name();
-    if ($username) {
-        $earnedPoints = (int) floor(($finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0)) / 10);
-        record_points_transaction(
-            $state,
-            $username,
-            $earnedPoints,
-            'Stay Earned Points',
-            'Earned from booking ' . $processedRoom['name'] . ' at ' . $processedRoom['hotel_name'],
-            $receiptId
-        );
-        $message .= ' ' . $earnedPoints . ' loyalty points added to your account.';
+            'discount_verification' => $discountProof !== null ? 'ID Submitted and Logged' : 'Not Required',
+        ]);
     }
-
-    $state['rooms'][$roomIndex]['updated_at'] = date(DATE_ATOM);
-    save_state($state);
 
     json_response([
         'status' => 'success',
         'message' => $message,
         'receipt' => $receiptId,
         'qr_code' => 'ACTIVE_RESERVATION_TOKEN_XYZ',
-        'room_status' => $state['rooms'][$roomIndex]['status'],
+        'room_status' => null,
         'payment_type' => $paymentLabel,
         'subtotal_amount' => $subtotalAmount,
         'discount_label' => $discountLabel,
         'discount_amount' => $discountAmount,
-        'final_amount' => $finalAmount ?: (float) ($processedRoom['display_price'] ?? $processedRoom['base_price'] ?? 0),
-        'discount_proof_name' => $discountProof['original_name'] ?? '',
-        'discount_verification' => $discountProof !== null ? 'ID Submitted and Logged' : 'Not Required',
+        'final_amount' => $finalAmount,
     ]);
 }
 
