@@ -18,6 +18,154 @@
         return `PHP ${Number(amount || 0).toFixed(2)}`;
     }
 
+    function formatCompactCurrency(amount) {
+        return new Intl.NumberFormat("en-PH", {
+            style: "currency",
+            currency: "PHP",
+            maximumFractionDigits: 0,
+        }).format(Number(amount || 0));
+    }
+
+    function parseTransactionDate(value) {
+        const normalized = String(value || "").trim().replace(" ", "T");
+        const date = normalized ? new Date(normalized) : new Date(NaN);
+        return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    function getQuarter(date) {
+        return Math.floor(date.getMonth() / 3) + 1;
+    }
+
+    function formatPeriodLabel(filter, date) {
+        if (filter === "daily") {
+            return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        }
+        if (filter === "monthly") {
+            return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+        }
+        if (filter === "quarterly") {
+            return `Q${getQuarter(date)} ${date.getFullYear()}`;
+        }
+        return String(date.getFullYear());
+    }
+
+    function getPeriodKey(filter, date) {
+        if (filter === "daily") {
+            return date.toISOString().slice(0, 10);
+        }
+        if (filter === "monthly") {
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+        }
+        if (filter === "quarterly") {
+            return `${date.getFullYear()}-Q${getQuarter(date)}`;
+        }
+        return String(date.getFullYear());
+    }
+
+    function collectRevenueMetrics(transactions, filter = "monthly") {
+        const parsedTransactions = transactions
+            .map((transaction) => {
+                const date = parseTransactionDate(transaction.timestamp);
+                return date ? {
+                    ...transaction,
+                    __date: date,
+                    __amount: Number(transaction.amount || 0),
+                } : null;
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.__date - a.__date);
+
+        const now = parsedTransactions[0]?.__date || new Date();
+        const filtered = parsedTransactions.filter((transaction) => {
+            const date = transaction.__date;
+            if (filter === "daily") {
+                return date.getFullYear() === now.getFullYear()
+                    && date.getMonth() === now.getMonth()
+                    && date.getDate() === now.getDate();
+            }
+            if (filter === "monthly") {
+                return date.getFullYear() === now.getFullYear()
+                    && date.getMonth() === now.getMonth();
+            }
+            if (filter === "quarterly") {
+                return date.getFullYear() === now.getFullYear()
+                    && getQuarter(date) === getQuarter(now);
+            }
+            return date.getFullYear() === now.getFullYear();
+        });
+
+        const trendMap = new Map();
+        parsedTransactions.forEach((transaction) => {
+            const key = getPeriodKey(filter, transaction.__date);
+            const current = trendMap.get(key) || {
+                label: formatPeriodLabel(filter, transaction.__date),
+                total: 0,
+                count: 0,
+            };
+            current.total += transaction.__amount;
+            current.count += 1;
+            trendMap.set(key, current);
+        });
+
+        const trend = Array.from(trendMap.values())
+            .sort((a, b) => a.label.localeCompare(b.label))
+            .slice(-8);
+
+        const byStatus = parsedTransactions.reduce((acc, transaction) => {
+            const key = transaction.status || "Unknown";
+            acc[key] = (acc[key] || 0) + transaction.__amount;
+            return acc;
+        }, {});
+
+        const byHotel = parsedTransactions.reduce((acc, transaction) => {
+            const key = transaction.hotel_name || "Unknown Hotel";
+            acc[key] = (acc[key] || 0) + transaction.__amount;
+            return acc;
+        }, {});
+
+        const byPayment = parsedTransactions.reduce((acc, transaction) => {
+            const raw = transaction.payment_type || "Unspecified";
+            const key = raw.split(" - ")[0];
+            acc[key] = (acc[key] || 0) + transaction.__amount;
+            return acc;
+        }, {});
+
+        const bySource = parsedTransactions.reduce((acc, transaction) => {
+            const key = transaction.source || "Unknown";
+            acc[key] = (acc[key] || 0) + transaction.__amount;
+            return acc;
+        }, {});
+
+        const byDay = parsedTransactions.reduce((acc, transaction) => {
+            const key = getPeriodKey("daily", transaction.__date);
+            acc[key] = (acc[key] || 0) + transaction.__amount;
+            return acc;
+        }, {});
+
+        const bestDayEntry = Object.entries(byDay).sort((a, b) => b[1] - a[1])[0] || null;
+        const bestDayDate = bestDayEntry ? new Date(`${bestDayEntry[0]}T00:00:00`) : null;
+
+        return {
+            now,
+            filtered,
+            total: filtered.reduce((sum, transaction) => sum + transaction.__amount, 0),
+            count: filtered.length,
+            average: filtered.length ? filtered.reduce((sum, transaction) => sum + transaction.__amount, 0) / filtered.length : 0,
+            trend,
+            byStatus,
+            byHotel,
+            byPayment,
+            bySource,
+            bestDayLabel: bestDayDate ? bestDayDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "N/A",
+            bestDayValue: bestDayEntry ? bestDayEntry[1] : 0,
+            completedTotal: parsedTransactions.filter((item) => item.status === "Completed").reduce((sum, item) => sum + item.__amount, 0),
+            reservedTotal: parsedTransactions.filter((item) => item.status === "Reserved").reduce((sum, item) => sum + item.__amount, 0),
+            cancelledTotal: parsedTransactions.filter((item) => item.status === "Cancelled").reduce((sum, item) => sum + item.__amount, 0),
+            adminTotal: parsedTransactions.filter((item) => item.source === "Admin Control").reduce((sum, item) => sum + item.__amount, 0),
+            topTransactions: parsedTransactions.slice().sort((a, b) => b.__amount - a.__amount).slice(0, 8),
+        };
+    }
+
     function getPage() {
         return document.body?.dataset.page || "";
     }
@@ -63,7 +211,7 @@
     function guardProtectedPage() {
         const page = getPage();
 
-        if (["admin", "employees", "transactions"].includes(page)) {
+        if (["admin", "employees", "transactions", "revenue"].includes(page)) {
             app.requireAdmin();
         }
 
@@ -123,6 +271,195 @@
                 </div>
             `;
         });
+    }
+
+    async function renderAdminRevenueTeaser() {
+        const page = getPage();
+        if (page !== "admin") {
+            return;
+        }
+
+        const revenueNode = document.getElementById("admin-live-revenue");
+        if (!revenueNode) {
+            return;
+        }
+
+        const state = await app.loadState();
+        const metrics = collectRevenueMetrics(state.transactions, "yearly");
+        revenueNode.textContent = formatCompactCurrency(metrics.total);
+    }
+
+    function renderMetricBlock(node, totalId, metaId, total, count, label) {
+        const totalNode = document.getElementById(totalId);
+        const metaNode = document.getElementById(metaId);
+
+        if (totalNode) {
+            totalNode.textContent = formatCurrency(total);
+        }
+        if (metaNode) {
+            metaNode.textContent = `${count} transactions ${label}.`;
+        }
+    }
+
+    async function renderRevenuePage(activeFilter = null) {
+        const page = getPage();
+        if (page !== "revenue") {
+            return;
+        }
+
+        const filter = activeFilter || window.__luxestayRevenueFilter || "monthly";
+        window.__luxestayRevenueFilter = filter;
+
+        const state = await app.loadState();
+        const metrics = collectRevenueMetrics(state.transactions, filter);
+        const dailyMetrics = collectRevenueMetrics(state.transactions, "daily");
+        const monthlyMetrics = collectRevenueMetrics(state.transactions, "monthly");
+        const quarterlyMetrics = collectRevenueMetrics(state.transactions, "quarterly");
+        const yearlyMetrics = collectRevenueMetrics(state.transactions, "yearly");
+        const maxTrend = Math.max(...metrics.trend.map((item) => item.total), 1);
+
+        document.querySelectorAll(".revenue-filter-btn").forEach((button) => {
+            const isActive = button.getAttribute("data-revenue-filter") === filter;
+            button.classList.toggle("btn-gold", isActive);
+            button.classList.toggle("btn-secondary", !isActive);
+        });
+
+        const selectedTotal = document.getElementById("revenue-selected-total");
+        const selectedCopy = document.getElementById("revenue-selected-copy");
+        const selectedBookings = document.getElementById("revenue-selected-bookings");
+        const selectedAverage = document.getElementById("revenue-selected-average");
+        const bestDay = document.getElementById("revenue-best-day");
+        const bestDayCopy = document.getElementById("revenue-best-day-copy");
+        const trendTitle = document.getElementById("revenue-trend-title");
+        const trendCaption = document.getElementById("revenue-trend-caption");
+        const trendBars = document.getElementById("revenue-trend-bars");
+        const hotelsNode = document.getElementById("revenue-hotels");
+        const paymentNode = document.getElementById("revenue-payment-mix");
+        const sourceNode = document.getElementById("revenue-source-mix");
+        const topTransactionsNode = document.getElementById("revenue-top-transactions");
+        const statusBreakdownNode = document.getElementById("revenue-status-breakdown");
+
+        if (selectedTotal) {
+            selectedTotal.textContent = formatCurrency(metrics.total);
+        }
+        if (selectedCopy) {
+            selectedCopy.textContent = `${filter.charAt(0).toUpperCase() + filter.slice(1)} revenue snapshot from the latest operating window.`;
+        }
+        if (selectedBookings) {
+            selectedBookings.textContent = String(metrics.count);
+        }
+        if (selectedAverage) {
+            selectedAverage.textContent = formatCurrency(metrics.average);
+        }
+        if (bestDay) {
+            bestDay.textContent = metrics.bestDayLabel === "N/A" ? "N/A" : metrics.bestDayLabel.replace(",", "");
+        }
+        if (bestDayCopy) {
+            bestDayCopy.textContent = metrics.bestDayValue ? `${formatCurrency(metrics.bestDayValue)} generated on the strongest day.` : "No transaction activity yet.";
+        }
+        if (trendTitle) {
+            trendTitle.textContent = `${filter.charAt(0).toUpperCase() + filter.slice(1)} revenue trend`;
+        }
+        if (trendCaption) {
+            trendCaption.textContent = `Reading the ${filter} revenue window`;
+        }
+
+        renderMetricBlock(document, "revenue-daily-total", "revenue-daily-meta", dailyMetrics.total, dailyMetrics.count, "today");
+        renderMetricBlock(document, "revenue-monthly-total", "revenue-monthly-meta", monthlyMetrics.total, monthlyMetrics.count, "this month");
+        renderMetricBlock(document, "revenue-quarterly-total", "revenue-quarterly-meta", quarterlyMetrics.total, quarterlyMetrics.count, "this quarter");
+        renderMetricBlock(document, "revenue-yearly-total", "revenue-yearly-meta", yearlyMetrics.total, yearlyMetrics.count, "this year");
+
+        const completedNode = document.getElementById("revenue-completed-total");
+        const reservedNode = document.getElementById("revenue-reserved-total");
+        const cancelledNode = document.getElementById("revenue-cancelled-total");
+        const adminNode = document.getElementById("revenue-admin-total");
+
+        if (completedNode) {
+            completedNode.textContent = formatCurrency(metrics.completedTotal);
+        }
+        if (reservedNode) {
+            reservedNode.textContent = formatCurrency(metrics.reservedTotal);
+        }
+        if (cancelledNode) {
+            cancelledNode.textContent = formatCurrency(metrics.cancelledTotal);
+        }
+        if (adminNode) {
+            adminNode.textContent = formatCurrency(metrics.adminTotal);
+        }
+
+        if (trendBars) {
+            trendBars.innerHTML = metrics.trend.length ? metrics.trend.map((item) => `
+                <div class="option-tile p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-semibold text-[#171717]">${escapeHtml(item.label)}</p>
+                            <p class="mt-1 text-sm text-gray-500">${item.count} transactions</p>
+                        </div>
+                        <p class="text-sm font-extrabold text-[#171717]">${formatCurrency(item.total)}</p>
+                    </div>
+                    <div class="mt-4 h-3 overflow-hidden rounded-full bg-black/5">
+                        <div class="h-full rounded-full bg-gradient-to-r from-[#d4af37] via-[#e2c869] to-[#171717]" style="width: ${(item.total / maxTrend) * 100}%;"></div>
+                    </div>
+                </div>
+            `).join("") : `<div class="option-tile p-5 text-sm leading-7 text-gray-600">No revenue trend data is available yet.</div>`;
+        }
+
+        const buildListMarkup = (entries, formatter) => entries.length
+            ? entries.map(([label, value]) => `
+                <div class="option-tile p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-semibold text-[#171717]">${escapeHtml(label)}</p>
+                        </div>
+                        <p class="text-sm font-extrabold text-[#171717]">${formatter(value)}</p>
+                    </div>
+                </div>
+            `).join("")
+            : `<div class="option-tile p-5 text-sm leading-7 text-gray-600">No revenue data available yet.</div>`;
+
+        if (hotelsNode) {
+            hotelsNode.innerHTML = buildListMarkup(
+                Object.entries(metrics.byHotel).sort((a, b) => b[1] - a[1]).slice(0, 6),
+                (value) => formatCurrency(value)
+            );
+        }
+        if (paymentNode) {
+            paymentNode.innerHTML = buildListMarkup(
+                Object.entries(metrics.byPayment).sort((a, b) => b[1] - a[1]).slice(0, 6),
+                (value) => formatCurrency(value)
+            );
+        }
+        if (sourceNode) {
+            sourceNode.innerHTML = buildListMarkup(
+                Object.entries(metrics.bySource).sort((a, b) => b[1] - a[1]).slice(0, 6),
+                (value) => formatCurrency(value)
+            );
+        }
+
+        if (topTransactionsNode) {
+            topTransactionsNode.innerHTML = metrics.topTransactions.length ? metrics.topTransactions.map((transaction) => `
+                <tr>
+                    <td>${escapeHtml(transaction.receipt || "Pending")}</td>
+                    <td>
+                        <div>
+                            <p class="font-semibold text-[#171717]">${escapeHtml(transaction.unit_name)}</p>
+                            <p class="mt-1 text-sm text-gray-500">${escapeHtml(transaction.hotel_name)}</p>
+                        </div>
+                    </td>
+                    <td><span class="status-pill ${escapeHtml((window.getStatusClass?.(transaction.status) || "available"))}">${escapeHtml(transaction.status)}</span></td>
+                    <td>${escapeHtml(transaction.source || "Unknown")}</td>
+                    <td>${escapeHtml(transaction.payment_type || "Unknown")}</td>
+                    <td>${formatCurrency(transaction.amount)}</td>
+                </tr>
+            `).join("") : `<tr><td colspan="6" class="text-center text-gray-500">No high value transactions available yet.</td></tr>`;
+        }
+
+        if (statusBreakdownNode) {
+            statusBreakdownNode.innerHTML = buildListMarkup(
+                Object.entries(metrics.byStatus).sort((a, b) => b[1] - a[1]),
+                (value) => formatCurrency(value)
+            );
+        }
     }
 
     function setupLoginPage() {
@@ -454,6 +791,9 @@
         if (getPage() === "home") {
             renderHomeShell();
         }
+        if (getPage() === "admin") {
+            renderAdminRevenueTeaser();
+        }
     }
 
     attachGlobalActions();
@@ -480,6 +820,15 @@
             document.getElementById("frontdesk-chat-send")?.addEventListener("click", sendFrontdeskMessage);
             document.getElementById("frontdesk-chat-close")?.addEventListener("click", closeFrontdeskChat);
             document.getElementById("frontdesk-call-close")?.addEventListener("click", closeFrontdeskCall);
+        }
+
+        if (page === "revenue") {
+            renderRevenuePage();
+            document.querySelectorAll(".revenue-filter-btn").forEach((button) => {
+                button.addEventListener("click", () => {
+                    renderRevenuePage(button.getAttribute("data-revenue-filter") || "monthly");
+                });
+            });
         }
     });
 
